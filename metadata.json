@@ -1,0 +1,5 @@
+{
+  "name": "Veo Vision: AI Video Generator",
+  "description": "Generate stunning videos from text prompts and images using Google's Veo model. Select different aspect ratios and bring your creative visions to life with beautiful UI designs.",
+  "requestFramePermissions": []
+}
