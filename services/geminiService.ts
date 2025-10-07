@@ -6,8 +6,23 @@ import { VideoGenerationOptions } from '../types';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { toBlobURL } from '@ffmpeg/util';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Lazily initialize the AI client to provide a better error message if the API key is missing.
+let ai: GoogleGenAI | null = null;
 let ffmpeg: FFmpeg | null = null;
+
+function getAiClient(): GoogleGenAI {
+  if (ai) {
+    return ai;
+  }
+  
+  if (!process.env.API_KEY) {
+    // This error is critical for users deploying to services like Vercel.
+    throw new Error("API key not configured. Please set the API_KEY environment variable in your hosting provider's settings. The application cannot connect to the AI service without it.");
+  }
+
+  ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  return ai;
+}
 
 async function loadFFmpeg(setLoadingMessage: (message: string) => void): Promise<FFmpeg> {
     if (ffmpeg && ffmpeg.loaded) {
@@ -51,9 +66,9 @@ export async function generateVideo(
 ): Promise<string> {
   const { prompt, image, aspectRatio, audio } = options;
   
-  if (!process.env.API_KEY) {
-    throw new Error("API key is not configured. The application administrator needs to set the API_KEY environment variable.");
-  }
+  // Get the AI client. This will throw a user-friendly error if the API key is missing.
+  const localAi = getAiClient();
+  const apiKey = process.env.API_KEY!; // We know it's defined because getAiClient would have thrown otherwise.
 
   setLoadingMessage("Initiating video generation...");
 
@@ -74,7 +89,7 @@ export async function generateVideo(
   }
 
   try {
-    let operation = await ai.models.generateVideos(generateVideosParams);
+    let operation = await localAi.models.generateVideos(generateVideosParams);
     
     setLoadingMessage("Request sent. The model is now processing...");
     
@@ -84,7 +99,7 @@ export async function generateVideo(
       await new Promise(resolve => setTimeout(resolve, 10000));
       
       setLoadingMessage(`Checking progress (attempt ${checks})... This can take a few minutes.`);
-      operation = await ai.operations.getVideosOperation({ operation: operation });
+      operation = await localAi.operations.getVideosOperation({ operation: operation });
     }
 
     if (operation.error) {
@@ -98,7 +113,7 @@ export async function generateVideo(
     }
     
     setLoadingMessage("Downloading generated video...");
-    const videoResponse = await fetch(`${downloadLink}&key=${process.env.API_KEY}`);
+    const videoResponse = await fetch(`${downloadLink}&key=${apiKey}`);
     if (!videoResponse.ok) {
       throw new Error(`Failed to download video: ${videoResponse.statusText}`);
     }
