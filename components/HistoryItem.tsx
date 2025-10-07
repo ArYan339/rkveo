@@ -8,7 +8,9 @@ const DownloadIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}><path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 9.293a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
 );
 const SettingsIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /><path fillRule="evenodd" d="M12.5 20a7.5 7.5 0 100-15 7.5 7.5 0 000 15zM2.5 5a7.5 7.5 0 1015 0 7.5 7.5 0 00-15 0z" clipRule="evenodd" /></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
+        <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0l-.1.41c-.44.18-.88.43-1.3.73l-.4-.17c-1.5-.64-3.1.8-2.46 2.3l.22.48c-.18.47-.31.98-.38 1.5l-.42.08c-1.56.38-1.56 2.6 0 2.98l.41.1c.18.44.43.88.73 1.3l-.17.4c-.64 1.5.8 3.1 2.3 2.46l.48-.22c.47.18.98.31 1.5.38l.08.42c.38 1.56 2.6 1.56 2.98 0l.1-.41c.44-.18.88-.43 1.3-.73l.4.17c1.5.64 3.1-.8 2.46-2.3l-.22-.48c.18-.47.31-.98.38-1.5l.42-.08c1.56-.38 1.56-2.6 0-2.98l-.41-.1c-.18-.44-.43-.88-.73-1.3l.17-.4c.64-1.5-.8-3.1-2.3-2.46l-.48.22c-.47-.18-.98-.31-1.5-.38l-.08-.42zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+    </svg>
 );
 const TrashIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
