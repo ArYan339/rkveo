@@ -6,11 +6,10 @@ import { VideoGenerationOptions } from '../types';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { toBlobURL } from '@ffmpeg/util';
 
-if (!process.env.API_KEY) {
-  throw new Error("API_KEY environment variable is not set");
-}
+// The user has provided an API key to fix the application.
+const API_KEY = "AIzaSyCJPe3Z5esszL2lJkreFRX4r0GMwS0Nkdw";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: API_KEY });
 let ffmpeg: FFmpeg | null = null;
 
 async function loadFFmpeg(setLoadingMessage: (message: string) => void): Promise<FFmpeg> {
@@ -80,7 +79,7 @@ export async function generateVideo(
     }
     
     setLoadingMessage("Downloading generated video...");
-    const videoResponse = await fetch(`${downloadLink}&key=${process.env.API_KEY}`);
+    const videoResponse = await fetch(`${downloadLink}&key=${API_KEY}`);
     if (!videoResponse.ok) {
       throw new Error(`Failed to download video: ${videoResponse.statusText}`);
     }
