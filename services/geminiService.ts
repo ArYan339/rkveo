@@ -6,10 +6,7 @@ import { VideoGenerationOptions } from '../types';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { toBlobURL } from '@ffmpeg/util';
 
-// The user has provided an API key to fix the application.
-const API_KEY = "AIzaSyCJPe3Z5esszL2lJkreFRX4r0GMwS0Nkdw";
-
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 let ffmpeg: FFmpeg | null = null;
 
 async function loadFFmpeg(setLoadingMessage: (message: string) => void): Promise<FFmpeg> {
@@ -30,12 +27,34 @@ async function loadFFmpeg(setLoadingMessage: (message: string) => void): Promise
     return ffmpeg;
 }
 
+// A helper to format error messages for the user.
+function formatErrorMessage(error: unknown): string {
+    let errorMessage = "An unknown error occurred during video generation.";
+    if (error instanceof Error) {
+        errorMessage = error.message;
+    }
+    
+    // Provide user-friendly messages for common API errors.
+    if (errorMessage.includes("billing enabled")) {
+      return "Video generation failed. The Veo model requires Google Cloud Platform billing to be enabled for your API key. Please check your account's billing status and API key permissions.";
+    } else if (errorMessage.includes("API key not valid")) {
+      return "Invalid API key. Please ensure your API key is correctly configured and has the necessary permissions to use the Veo model.";
+    }
+    
+    return errorMessage;
+}
+
 
 export async function generateVideo(
   options: VideoGenerationOptions,
   setLoadingMessage: (message: string) => void
 ): Promise<string> {
   const { prompt, image, aspectRatio, audio } = options;
+  
+  if (!process.env.API_KEY) {
+    throw new Error("API key is not configured. The application administrator needs to set the API_KEY environment variable.");
+  }
+
   setLoadingMessage("Initiating video generation...");
 
   const generateVideosParams: any = {
@@ -69,7 +88,7 @@ export async function generateVideo(
     }
 
     if (operation.error) {
-      throw new Error(`Operation failed: ${operation.error.message}`);
+      throw new Error(operation.error.message || "Operation failed with an unknown error.");
     }
 
     const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
@@ -79,7 +98,7 @@ export async function generateVideo(
     }
     
     setLoadingMessage("Downloading generated video...");
-    const videoResponse = await fetch(`${downloadLink}&key=${API_KEY}`);
+    const videoResponse = await fetch(`${downloadLink}&key=${process.env.API_KEY}`);
     if (!videoResponse.ok) {
       throw new Error(`Failed to download video: ${videoResponse.statusText}`);
     }
@@ -123,7 +142,6 @@ export async function generateVideo(
 
   } catch (error) {
     console.error("Error generating video:", error);
-    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred during video generation.";
-    throw new Error(errorMessage);
+    throw new Error(formatErrorMessage(error));
   }
 }
